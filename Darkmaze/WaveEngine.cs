@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 
+//from https://www.codeproject.com/Articles/994051/Wave-Simulator-with-Csharp
 namespace WaveSimulator
 {
     public class WaveEngine
