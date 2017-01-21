@@ -11,9 +11,6 @@ using WaveSimulator;
 
 namespace Darkmaze
 {
-    /// <summary>
-    /// This is the main type for your game.
-    /// </summary>
     public class Core : Game
     {
         GraphicsDeviceManager graphics;
@@ -22,6 +19,7 @@ namespace Darkmaze
         SoundEffect _roar;
         Song _success;
 
+        private int level = 1;
         private uint[] _pixels;
         private Texture2D _canvas;
         private WaveEngine _engine;
@@ -44,13 +42,7 @@ namespace Darkmaze
             
             Content.RootDirectory = "Content";
         }
-
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
+        
         protected override void Initialize()
         {
             _font = Content.Load<SpriteFont>("Font");
@@ -61,20 +53,19 @@ namespace Darkmaze
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             
-            NewLevel();
+            NewLevel(false, false);
 
             base.Initialize();
         }
 
-        private void NewLevel(bool withWalls = true)
+        private void NewLevel(bool withWalls = true, bool withEnemies = true)
         {
             _pixels = new uint[Width * Height];
             _engine = new WaveEngine(Height);
             var msize = Height / Mfactor;
             if (Height % Mfactor != 1)
                 Debugger.Break();
-
-            //place walls
+            
             if (withWalls)
             {
                 var maze = new Maze(msize, msize);
@@ -108,17 +99,20 @@ namespace Darkmaze
             _engine.Oscillator1Position = new Point(Mfactor/2, Mfactor/ 2);
 
             //place enemies
-            var rand = new Random();
             _enemies = new List<Enemy>();
-            for (int i = 0; i < NbEnemies; i++)
+            if (withEnemies)
             {
-                Point position;
-                do
+                var rand = new Random();
+                for (int i = 0; i < NbEnemies; i++)
                 {
-                    position = new Point { X = rand.Next(Width), Y = rand.Next(Height) };
-                } while (_engine.IsWall(position.X, position.Y));
+                    Point position;
+                    do
+                    {
+                        position = new Point {X = rand.Next(Width), Y = rand.Next(Height)};
+                    } while (_engine.IsWall(position.X, position.Y));
 
-                _enemies.Add(new Enemy { Position = position.ToVector2() });
+                    _enemies.Add(new Enemy {Position = position.ToVector2()});
+                }
             }
 
             _dead = false;
@@ -130,12 +124,8 @@ namespace Darkmaze
         private Point _source;
         private bool _dead;
         private bool _win;
-
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        private bool _shh;
+        
         protected override void Update(GameTime gameTime)
         {
             var keys = Keyboard.GetState();
@@ -171,14 +161,16 @@ namespace Darkmaze
                 if (winningZone.Contains(_engine.Oscillator1Position))
                 {
                     _win = true;
-                    MediaPlayer.Play(_success);
+                    level++;
+                    if(level > 3)
+                        MediaPlayer.Play(_success);
                 }
             }
             else
             {
                 if (keys.IsKeyDown(Keys.Enter))
                 {
-                    NewLevel();
+                    NewLevel(withWalls:level > 2);
                     base.Update(gameTime);
                     return;
                 }
@@ -193,6 +185,7 @@ namespace Darkmaze
                     //jump on player
                     enemy.Attack(_source, wavePower);
                     _roar.Play();
+                    _shh = true;
                 }
                 enemy.Update();
             }
@@ -225,14 +218,9 @@ namespace Darkmaze
             double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
             return stdev * randStdNormal;
         }
-
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        
         protected override void Draw(GameTime gameTime)
         {
-
             if (_dead)
             {
                 GraphicsDevice.Clear(Color.Red);
@@ -248,18 +236,45 @@ namespace Darkmaze
             else if (_win)
             {
                 GraphicsDevice.Clear(new Color(new Vector3(1f, 0.6f, 1f)));
-                var youwin = "y o u  w i n";
-                var size = _font.MeasureString(youwin);
                 _spriteBatch.Begin();
-                _spriteBatch.DrawString(_font, youwin, new Vector2 {Y = Height - size.Y, X = Width - size.X / 2}, new Color(new Vector3(0.4f, 1f, 1f)));
+
+                if (level == 2)
+                {
+                    string help = "Let's make it a bit harder, try again (press enter)";
+                    _spriteBatch.DrawString(_font, help, new Vector2 {Y = Height * 2 - 50, X = 20}, Color.White, 0f, Vector2.Zero, new Vector2(0.5f), SpriteEffects.None, 0f);
+                }
+                else if (level == 3)
+                {
+                    string help = "Now I'll put some obstacles";
+                    _spriteBatch.DrawString(_font, help, new Vector2 { Y = Height * 2 - 50, X = 20 }, Color.White, 0f, Vector2.Zero, new Vector2(0.5f), SpriteEffects.None, 0f);
+                }
+                else
+                {
+                    var youwin = "y o u  w i n";
+                    var size = _font.MeasureString(youwin);
+                    _spriteBatch.DrawString(_font, youwin, new Vector2 {Y = Height - size.Y, X = Width - size.X / 2}, new Color(new Vector3(0.4f, 1f, 1f)));
+                }
             }
             else
             {
                 _spriteBatch.Begin();
+
                 _spriteBatch.Draw(_canvas, new Rectangle(0, 0, Width * 2, Height * 2), Color.White);
 
                 foreach (var enemy in _enemies)
                     enemy.Draw(_spriteBatch);
+
+                //draw help
+                if (level == 1)
+                {
+                    var help = "press space to see where you are";
+                    _spriteBatch.DrawString(_font, help, new Vector2 {Y = Height*2 - 50, X = 20}, Color.White, 0f, Vector2.Zero, new Vector2(0.5f), SpriteEffects.None, 0f);
+                }
+                if (level == 2 && _shh)
+                {
+                    var help = "Shh !";
+                    _spriteBatch.DrawString(_font, help, new Vector2 { Y = Height * 2 - 50, X = 20 }, Color.White);
+                }
             }
             _spriteBatch.End();
 

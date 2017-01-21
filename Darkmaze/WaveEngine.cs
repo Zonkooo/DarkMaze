@@ -187,11 +187,15 @@ namespace WaveSimulator
 
         public bool IsWall(int x, int y)
         {
+            if (x + y * size > vd.Length)
+                return true;
             return vd_static[x + y * size];
         }
 
         public float GetAmplitude(int x, int y)
         {
+            if (x + y * size > vd.Length)
+                return 0f;
             return vd[x + y * size];
         }
 
