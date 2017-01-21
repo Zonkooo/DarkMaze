@@ -341,6 +341,11 @@ namespace WaveSimulator
             }
         }
 
+        public void SetWall(int x, int y)
+        {
+            vd_static[x + y*size] = true;
+        }
+
         /// <summary>
         /// Gives a float array of specified attribute of particles in a specified rectangular area.
         /// </summary>

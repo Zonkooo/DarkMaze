@@ -1,0 +1,8 @@
+*.vsp
+*.psess
+*.resx
+*.suo
+*.settings
+*.user
+bin
+obj

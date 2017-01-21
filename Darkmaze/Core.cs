@@ -1,4 +1,5 @@
 ﻿using System;
+using MazeGeneration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -41,8 +42,21 @@ namespace Darkmaze
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _engine = new WaveEngine(Height);
+            var maze = new Maze(100, 100);
+            for (int x = 0; x < 100; x++)
+            {
+                for (int y = 0; y < 100; y++)
+                {
+                    if ((maze[x, y] & CellState.Right) != 0)
+                        _engine.SetWall(x * 2 + 1, y * 2);
+                    if ((maze[x, y] & CellState.Bottom) != 0)
+                        _engine.SetWall(x * 2, y * 2 + 1);
+                    _engine.SetWall(x * 2 + 1, y * 2 + 1);
+                }
+            }
             _engine.Oscillator1Position = new Point(100, 100);
             _engine.Oscillator1Active = true;
+
 
             base.Initialize();
         }
