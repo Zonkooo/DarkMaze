@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using WaveSimulator;
 
 namespace Darkmaze
@@ -19,11 +20,14 @@ namespace Darkmaze
         SpriteBatch _spriteBatch;
         SpriteFont _font;
         SoundEffect _roar;
+        Song _success;
 
         private uint[] _pixels;
         private Texture2D _canvas;
         private WaveEngine _engine;
         private List<Enemy> _enemies;
+
+        private Rectangle winningZone = new Rectangle(Width-Mfactor/2, Height-Mfactor/2, Mfactor/2, Mfactor/2);
 
         private const int Mfactor = 25; //width of the alleys
         private const int Width = Mfactor * 10 + 1;
@@ -51,6 +55,7 @@ namespace Darkmaze
         {
             _font = Content.Load<SpriteFont>("Font");
             _roar = Content.Load<SoundEffect>("roar");
+            _success = Content.Load<Song>("wave");
 
             _canvas = new Texture2D(GraphicsDevice, Width, Height, false, SurfaceFormat.Color);
 
@@ -117,12 +122,14 @@ namespace Darkmaze
             }
 
             _dead = false;
+            _win = false;
         }
 
         private KeyboardState _prevState = new KeyboardState();
         private int _waveCoolDown;
         private Point _source;
         private bool _dead;
+        private bool _win;
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
@@ -132,7 +139,7 @@ namespace Darkmaze
         protected override void Update(GameTime gameTime)
         {
             var keys = Keyboard.GetState();
-            if (!_dead)
+            if (!_dead && !_win)
             {
                 var pos = _engine.Oscillator1Position;
                 if (keys.IsKeyDown(Keys.Up) && !_engine.IsWall(pos.X, pos.Y - 1))
@@ -160,6 +167,11 @@ namespace Darkmaze
                 {
                     if (enemy.KillsOnPosition(_engine.Oscillator1Position.ToVector2()))
                         _dead = true;
+                }
+                if (winningZone.Contains(_engine.Oscillator1Position))
+                {
+                    _win = true;
+                    MediaPlayer.Play(_success);
                 }
             }
             else
@@ -220,25 +232,34 @@ namespace Darkmaze
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Red);
 
-            _spriteBatch.Begin();
-            if (!_dead)
+            if (_dead)
             {
+                GraphicsDevice.Clear(Color.Red);
+                _spriteBatch.Begin();
+                var youDied = "you died.";
+                var size = _font.MeasureString(youDied);
+                _spriteBatch.DrawString(_font, youDied, new Vector2 {Y = Height - size.Y, X = Width - size.X / 2}, Color.White);
+
+                var pressEnterToRestart = "press enter to restart";
+                size = _font.MeasureString(pressEnterToRestart);
+                _spriteBatch.DrawString(_font, pressEnterToRestart, new Vector2 {Y = Height + 10, X = Width - size.X / 4}, Color.White, 0f, Vector2.Zero, new Vector2(0.5f), SpriteEffects.None, 0f);
+            }
+            else if (_win)
+            {
+                GraphicsDevice.Clear(new Color(new Vector3(1f, 0.6f, 1f)));
+                var youwin = "y o u  w i n";
+                var size = _font.MeasureString(youwin);
+                _spriteBatch.Begin();
+                _spriteBatch.DrawString(_font, youwin, new Vector2 {Y = Height - size.Y, X = Width - size.X / 2}, new Color(new Vector3(0.4f, 1f, 1f)));
+            }
+            else
+            {
+                _spriteBatch.Begin();
                 _spriteBatch.Draw(_canvas, new Rectangle(0, 0, Width * 2, Height * 2), Color.White);
 
                 foreach (var enemy in _enemies)
                     enemy.Draw(_spriteBatch);
-            }
-            else
-            {
-                var youDied = "you died.";
-                var size = _font.MeasureString(youDied);
-                  _spriteBatch.DrawString(_font, youDied, new Vector2 {Y = Height - size.Y, X = Width - size.X/2}, Color.White);
-
-                var pressEnterToRestart = "press enter to restart";
-                size = _font.MeasureString(pressEnterToRestart);
-                _spriteBatch.DrawString(_font, pressEnterToRestart, new Vector2 {Y = Height + 10, X = Width - size.X/4}, Color.White, 0f, Vector2.Zero, new Vector2(0.5f), SpriteEffects.None, 0f);
             }
             _spriteBatch.End();
 
