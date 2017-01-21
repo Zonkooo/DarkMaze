@@ -24,8 +24,8 @@ namespace Darkmaze
         private List<Enemy> _enemies;
 
         private const int Mfactor = 25; //width of the alleys
-        private const int Width = Mfactor * 10;
-        private const int Height = Mfactor * 10;
+        private const int Width = Mfactor * 10 + 1;
+        private const int Height = Mfactor * 10 + 1;
 
         public Core()
         {
@@ -62,8 +62,10 @@ namespace Darkmaze
             _pixels = new uint[Width * Height];
             _engine = new WaveEngine(Height);
             var msize = Height / Mfactor;
-            if (Height % Mfactor != 0)
+            if (Height % Mfactor != 1)
                 Debugger.Break();
+
+            //place walls
             var maze = new Maze(msize, msize);
             for (int x = 0; x < msize; x++)
             {
@@ -72,19 +74,27 @@ namespace Darkmaze
                     if ((maze[x, y] & CellState.Right) != 0)
                     {
                         for (int i = 0; i < Mfactor - 1; i++)
-                            _engine.SetWall(x * Mfactor + Mfactor - 1, y * Mfactor + i);
+                            _engine.SetWall(x * Mfactor + Mfactor, y * Mfactor + i + 1);
                     }
                     if ((maze[x, y] & CellState.Bottom) != 0)
                     {
                         for (int i = 0; i < Mfactor - 1; i++)
-                            _engine.SetWall(x * Mfactor + i, y * Mfactor + Mfactor - 1);
+                            _engine.SetWall(x * Mfactor + i + 1, y * Mfactor + Mfactor);
                     }
 
-                    _engine.SetWall(x * Mfactor + Mfactor - 1, y * Mfactor + Mfactor - 1);
+                    _engine.SetWall(x * Mfactor + Mfactor, y * Mfactor + Mfactor);
                 }
             }
-            _engine.Oscillator1Position = new Point(Width / 2, Height / 2);
 
+            for (int i = 0; i < _engine.Size; i++)
+            {
+                _engine.SetWall(i, 0);
+                _engine.SetWall(0, i);
+            }
+
+            _engine.Oscillator1Position = new Point(Mfactor/2, Mfactor/ 2);
+
+            //place enemies
             var rand = new Random();
             _enemies = new List<Enemy>();
             for (int i = 0; i < 10; i++)
