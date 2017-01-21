@@ -14,7 +14,7 @@ namespace Darkmaze
     public class Core : Game
     {
         GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        SpriteBatch _spriteBatch;
         private uint[] _pixels;
         private Texture2D _canvas;
         private WaveEngine _engine;
@@ -40,7 +40,7 @@ namespace Darkmaze
             _canvas = new Texture2D(GraphicsDevice, Width, Height, false, SurfaceFormat.Color);
             _pixels = new uint[Width * Height];
 
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _engine = new WaveEngine(Height);
             var mfactor = 30;
@@ -110,9 +110,9 @@ namespace Darkmaze
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin();
-            spriteBatch.Draw(_canvas, new Rectangle(0, 0, Width*2, Height*2), Color.White);
-            spriteBatch.End();
+            _spriteBatch.Begin();
+            _spriteBatch.Draw(_canvas, new Rectangle(0, 0, Width*2, Height*2), Color.White);
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }

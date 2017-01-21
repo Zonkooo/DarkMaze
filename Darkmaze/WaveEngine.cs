@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 using Microsoft.Xna.Framework;
 
 namespace WaveSimulator
@@ -19,23 +15,10 @@ namespace WaveSimulator
 
 
         float mass = 0.1f; // Mass of each particle. It is the same for all particles.
-        float limit = 500f; // Maximum absolute height a particle can reach.
         float action_resolution = 20f; // Resolution of movement of particles.
-        float sustain = 1000f; // Anti-damping. Propagation range increases by increasing this variable. Minimum is 1f.
-        int delay = 1; // Time-out in milliseconds for force calculations.
+        float sustain = 30f; // Anti-damping. Propagation range increases by increasing this variable. Minimum is 1f.
         float phase1 = 0f; // Current phase value of oscillator1.
         float phase2 = 0f; // Current phase value of oscillator2.
-        float freq1 = 0.2f; // Phase changing rate of oscillator1 per calculation. Frequency increases by increasing this variable.
-        float freq2 = 0.2f; // Phase changing rate of oscillator2 per calculation. Frequency increases by increasing this variable.
-        float power = 1.0f; // Power of the output force exerted on each particle. Natural value is 1.0f
-        
-        Thread ForceCalcT; // Worker thread that will do force calculations.
-        
-        bool work_now = false; // True = Thread must make calculations now, False = Thread must sleep now.
-
-        bool highcont = false; // High contrast drawing.
-
-        bool disposing = false; // It will be true once the termination starts.
 
         bool osc1active = false; // Is oscillator1 is turned on?
         bool osc2active = false; // Is oscillator2 is turned on?
@@ -45,10 +28,8 @@ namespace WaveSimulator
 
         int size = 200; // Size of the wave pool. It indicates both the width and height since the pool will always be a square.
 
-        Vector3 color1 = Color.Lime.ToVector3(); // Color of the crest or trough.
-        Vector3 color2 = Color.Red.ToVector3(); // Color of the crest or trough. 
-
-        Color colorstatic = Color.Yellow; // Color of the static particles.
+        readonly Vector3 color1 = Color.White.ToVector3(); // Color of the crest or trough.
+        readonly Vector3 color2 = Color.Black.ToVector3(); // Color of the crest or trough. 
 
 
         // These variables are used for edge absorbtion. It is used for eliminating reflection from window boundaries.
@@ -56,6 +37,7 @@ namespace WaveSimulator
         float min_sustain = 2f; // The lowest sustainability value. They are located at the boundaries.
         bool edge_absorbtion = true; // If true, the particles near the boundaries will have low sustainability.
         
+        [Flags]
         public enum ParticleAttribute
         {
             Height = 1,
@@ -78,19 +60,7 @@ namespace WaveSimulator
                 }
             }
         }
-
-        public float Limit
-        {
-            get { return limit; }
-            set
-            {
-                if (value > 0f)
-                {
-                    limit = value;
-                }
-            }
-        }
-
+        
         public float ActionResolution
         {
             get { return action_resolution; }
@@ -111,54 +81,20 @@ namespace WaveSimulator
                 if (value >= 1f)
                 {
                     sustain = value;
-                    setSustain();
+                    SetSustain();
                 }
             }
         }
-        public int Delay
-        {
-            get { return delay; }
-            set
-            {
-                if (value >= 0)
-                {
-                    delay = value;
-                }
-            }
-        }
-        public float PhaseRate1
-        {
-            get { return freq1; }
-            set
-            {
-                if (value > 0f && value < Math.PI * 2f)
-                {
-                    freq1 = value;
-                }
-            }
-        }
-        public float PhaseRate2
-        {
-            get { return freq2; }
-            set
-            {
-                if (value > 0f && value < Math.PI * 2f)
-                {
-                    freq2 = value;
-                }
-            }
-        }
-        public float Power
-        {
-            get { return power; }
-            set
-            {
-                if (power > 0f)
-                {
-                    power = value;
-                }
-            }
-        }
+        /// <summary>
+        /// should be between 0 and 2PI
+        /// </summary>
+        public float PhaseRate1 { get; set; } = 0.2f;
+
+        /// <summary>
+        /// should be between 0 and 2PI
+        /// </summary>
+        public float PhaseRate2 { get; set; } = 0.2f;
+
         public int Size
         {
             get { return size; }
@@ -167,7 +103,7 @@ namespace WaveSimulator
                 if (size >= 1f)
                 {
                     size = value;
-                    setPool();
+                    SetPool();
                 }
             }
         }
@@ -179,7 +115,7 @@ namespace WaveSimulator
                 if (value >= 1f)
                 {
                     min_sustain = value;
-                    setSustain();
+                    SetSustain();
                 }
             }
         }
@@ -191,33 +127,21 @@ namespace WaveSimulator
                 if (value > 0 && value < size / 2)
                 {
                     absorb_offset = value;
-                    setSustain();
+                    SetSustain();
                 }
             }
         }
-        public Color ColorStatic
-        {
-            get { return colorstatic; }
-            set
-            {
-                colorstatic = value;
-            }
-        }
-        public bool HighContrast
-        {
-            get { return highcont; }
-            set
-            {
-                highcont = value;
-            }
-        }
+        public Color ColorStatic { get; set; }
+
+        public bool HighContrast { get; set; } = false;
+
         public bool EdgeAbsorbtion
         {
             get { return edge_absorbtion; }
             set
             {
                 edge_absorbtion = value;
-                setSustain();
+                SetSustain();
             }
         }
 
@@ -227,7 +151,7 @@ namespace WaveSimulator
             set
             {
                 osc1active = value;
-                setSustain();
+                SetSustain();
             }
         }
 
@@ -237,7 +161,7 @@ namespace WaveSimulator
             set
             {
                 osc2active = value;
-                setSustain();
+                SetSustain();
             }
         }
         
@@ -249,7 +173,7 @@ namespace WaveSimulator
                 if (value.X + value.Y * size < size * size)
                 {
                     osc1point = value.X + value.Y * size;
-                    setSustain();
+                    SetSustain();
                 }
             }
         }
@@ -262,7 +186,7 @@ namespace WaveSimulator
                 if (value.X + value.Y * size < size * size)
                 {
                     osc2point = value.X + value.Y * size;
-                    setSustain();
+                    SetSustain();
                 }
             }
         }
@@ -274,13 +198,14 @@ namespace WaveSimulator
         public WaveEngine(int size)
         {
             this.size = size;
-            setPool();
+            ColorStatic = new Color(color1 + color2 / 2);
+            SetPool();
         }
 
         public void OneStep(uint[] buffer)
         {
             CalculateForces();
-            generatebitmap(buffer);
+            Generatebitmap(buffer);
         }
         
         /// <summary>
@@ -412,30 +337,14 @@ namespace WaveSimulator
 
             return result;
         }
-        /// <summary>
-        /// Starts the force calculation.
-        /// </summary>
-        public void Run()
-        {
-            work_now = true;
-        }
-
-        /// <summary>
-        /// Suspends the force calculation indefinitely.
-        /// </summary>
-        public void Stop()
-        {
-            work_now = false;
-        }
 
         void CalculateForces()
         {
-
             float total_height = 0;// This will be used to shift the height center of the whole particle system to the origin.
 
             // This loop calculates the forces exerted on the particles.
-            Parallel.For(0, vd.Length, (index) =>
-                //for (int index = 0; index < vd.Length; index += 1)
+            //Parallel.For(0, vd.Length, new ParallelOptions {MaxDegreeOfParallelism = 4}, index =>
+            for (int index = 0; index < vd.Length; index += 1)
             {
                 // If this is a static particle, it will not move at all. Continue with the next particle.
                 if (vd_static[index])
@@ -454,8 +363,8 @@ namespace WaveSimulator
                     // It will not be affected by any forces. It will just move up and down.
                     vdv[index] = 0;
                     vda[index] = 0;
-                    vd[index] = limit * (float) Math.Sin(phase1);
-                    phase1 += freq1;
+                    vd[index] = (float) Math.Sin(phase1);
+                    phase1 += PhaseRate1;
                     if (phase1 >= 2f * (float) Math.PI)
                         phase1 -= (float) Math.PI * 2f;
 
@@ -466,8 +375,8 @@ namespace WaveSimulator
                 {
                     vdv[index] = 0;
                     vda[index] = 0;
-                    vd[index] = limit * (float) Math.Sin(phase2);
-                    phase2 += freq2;
+                    vd[index] = (float) Math.Sin(phase2);
+                    phase2 += PhaseRate2;
                     if (phase2 >= 2f * (float) Math.PI)
                         phase2 -= (float) Math.PI * 2f;
 
@@ -588,11 +497,8 @@ namespace WaveSimulator
                 if (num_of_part != 0)
                 {
                     heights /= (float) num_of_part;
-
-                    if (power != 1.0f)
-                        vda[index] += Math.Sign(heights - vd[index]) * (float) Math.Pow(Math.Abs(vd[index] - heights), power) / mass;
-                    else
-                        vda[index] += -(vd[index] - heights) / mass;
+                    
+                    vda[index] += -(vd[index] - heights) / mass;
                 }
 
 
@@ -601,14 +507,11 @@ namespace WaveSimulator
 
                 // Don't let things go beyond their limit.
                 // This makes sense. It eliminates a critic uncertainty.
-                if (vda[index] > limit)
-                    vda[index] = limit;
-                else if (vda[index] < -limit)
-                    vda[index] = -limit;
+                vda[index] = MathHelper.Clamp(vda[index], -1f, 1f);
 
                 cont:
                 ;
-            });
+            }//);
             // Now we have finished with the force calculation.
 
             // Origin height is zero. So "shifting" is the distance between the system average height and the origin.
@@ -627,12 +530,7 @@ namespace WaveSimulator
                 // Here is the purpose of "action_resolution":
                 // It is used to divide movements.
                 // If the particle goes along the road at once, a chaos is most likely unavoidable.
-                if (vd[index] + vdv[index] / action_resolution > limit)
-                    vd[index] = limit;
-                else if (vd[index] + vdv[index] / action_resolution <= limit && vd[index] + vdv[index] / action_resolution >= -limit)
-                    vd[index] += vdv[index] / action_resolution; // Velocity feeds height.
-                else
-                    vd[index] = -limit;
+                vd[index] = MathHelper.Clamp(vd[index] + vdv[index] / action_resolution, -1f, 1f);
 
 
                 // Here is the last step on shifting the whole system to the origin point.
@@ -644,14 +542,14 @@ namespace WaveSimulator
         }
 
 
-        void generatebitmap(uint[] rgbdata)
+        void Generatebitmap(uint[] rgbdata)
         {
             // It's time for the coloration of the height.
             for (int index = 0; index < vd.Length; index++)
             {
                 // Brightness. This value is the 'brightness' of the height.
                 // Now we see why "limit" makes sense.
-                byte bright = (byte)((vd[index] + limit) / (limit * 2f / 255f));
+                byte bright = (byte)((vd[index] + 1f) / (2f / 255f));
 
                 if (vd_static[index])
                 {
@@ -659,13 +557,12 @@ namespace WaveSimulator
                 }
                 else
                 {
-                    if (highcont)
+                    if (HighContrast)
                     {
                         if (vd[index] > 0)
                         {
                             rgbdata[index] = GetPackedValue(color1);
                         }
-
                         else
                         {
                             rgbdata[index] = GetPackedValue(color2);
@@ -695,7 +592,7 @@ namespace WaveSimulator
         /// <summary>
         /// Sets sustainability of each particle.
         /// </summary>
-        void setSustain()
+        void SetSustain()
         {
             if (edge_absorbtion)
             {
@@ -784,7 +681,7 @@ namespace WaveSimulator
         /// <summary>
         /// Initializes the wave pool system.
         /// </summary>
-        void setPool()
+        void SetPool()
         {
             vd = new float[size * size];
 
@@ -796,7 +693,7 @@ namespace WaveSimulator
 
             vds = new float[size * size];
 
-            setSustain();
+            SetSustain();
         }
     }
 }
