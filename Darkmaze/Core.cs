@@ -16,6 +16,8 @@ namespace Darkmaze
     {
         GraphicsDeviceManager graphics;
         SpriteBatch _spriteBatch;
+        SpriteFont _font;
+
         private uint[] _pixels;
         private Texture2D _canvas;
         private WaveEngine _engine;
@@ -40,6 +42,8 @@ namespace Darkmaze
         /// </summary>
         protected override void Initialize()
         {
+            _font = Content.Load<SpriteFont>("Font");
+
             _canvas = new Texture2D(GraphicsDevice, Width, Height, false, SurfaceFormat.Color);
             _pixels = new uint[Width * Height];
 
@@ -163,8 +167,13 @@ namespace Darkmaze
 
             _spriteBatch.End();
 
-            if(_dead)
+            if (_dead)
+            {
                 GraphicsDevice.Clear(Color.Red);
+                _spriteBatch.Begin();
+                _spriteBatch.DrawString(_font, "you died.", new Vector2 {X = 235, Y = 275}, Color.White);
+                _spriteBatch.End();
+            }
 
             base.Draw(gameTime);
         }

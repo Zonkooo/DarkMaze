@@ -57,6 +57,7 @@
     <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Content\Font.spritefont" />
     <None Include="packages.config" />
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
