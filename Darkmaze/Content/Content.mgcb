@@ -43,3 +43,9 @@
 /processorParam:TextureFormat=Color
 /build:door_small.png
 
+#begin clac
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:clac
+

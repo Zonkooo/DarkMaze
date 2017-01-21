@@ -17,6 +17,7 @@ namespace Darkmaze
         SpriteBatch _spriteBatch;
         SpriteFont _font;
         SoundEffect _roar;
+        SoundEffect _clac;
         Song _success;
         Texture2D _door;
 
@@ -48,6 +49,7 @@ namespace Darkmaze
         {
             _font = Content.Load<SpriteFont>("Font");
             _roar = Content.Load<SoundEffect>("roar");
+            _clac = Content.Load<SoundEffect>("clac");
             _success = Content.Load<Song>("wave");
             _door = Content.Load<Texture2D>("door_small");
 
@@ -149,6 +151,7 @@ namespace Darkmaze
                     _engine.Oscillator1Active = true;
                     _engine.phase1 = 0f;
                     _waveCoolDown = (int) (MathHelper.TwoPi / _engine.PhaseRate1); //do one full oscilation
+                    _clac.Play();
                 }
                 if (_waveCoolDown-- == 0)
                 {
