@@ -51,7 +51,7 @@ namespace Darkmaze
                     }
                     _impactRadius++;
                 }
-                if (_impactRadius >= 20)
+                if (_impactRadius >= 30)
                 {
                     Active = false;
                 }

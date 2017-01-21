@@ -23,8 +23,9 @@ namespace Darkmaze
         private WaveEngine _engine;
         private List<Enemy> _enemies;
 
-        private const int Width = 30*10;
-        private const int Height = 30*10;
+        private const int Mfactor = 25; //width of the alleys
+        private const int Width = Mfactor * 10;
+        private const int Height = Mfactor * 10;
 
         public Core()
         {
@@ -60,9 +61,8 @@ namespace Darkmaze
         {
             _pixels = new uint[Width * Height];
             _engine = new WaveEngine(Height);
-            var mfactor = 30;
-            var msize = Height / mfactor;
-            if (Height % mfactor != 0)
+            var msize = Height / Mfactor;
+            if (Height % Mfactor != 0)
                 Debugger.Break();
             var maze = new Maze(msize, msize);
             for (int x = 0; x < msize; x++)
@@ -71,16 +71,16 @@ namespace Darkmaze
                 {
                     if ((maze[x, y] & CellState.Right) != 0)
                     {
-                        for (int i = 0; i < mfactor - 1; i++)
-                            _engine.SetWall(x * mfactor + mfactor - 1, y * mfactor + i);
+                        for (int i = 0; i < Mfactor - 1; i++)
+                            _engine.SetWall(x * Mfactor + Mfactor - 1, y * Mfactor + i);
                     }
                     if ((maze[x, y] & CellState.Bottom) != 0)
                     {
-                        for (int i = 0; i < mfactor - 1; i++)
-                            _engine.SetWall(x * mfactor + i, y * mfactor + mfactor - 1);
+                        for (int i = 0; i < Mfactor - 1; i++)
+                            _engine.SetWall(x * Mfactor + i, y * Mfactor + Mfactor - 1);
                     }
 
-                    _engine.SetWall(x * mfactor + mfactor - 1, y * mfactor + mfactor - 1);
+                    _engine.SetWall(x * Mfactor + Mfactor - 1, y * Mfactor + Mfactor - 1);
                 }
             }
             _engine.Oscillator1Position = new Point(Width / 2, Height / 2);
@@ -193,8 +193,13 @@ namespace Darkmaze
             }
             else
             {
-                _spriteBatch.DrawString(_font, "you died.", new Vector2 {X = 220, Y = 268}, Color.White);
-                _spriteBatch.DrawString(_font, "press enter to restart", new Vector2 {X = 210, Y = 315}, Color.White, 0f, Vector2.Zero, new Vector2(0.5f), SpriteEffects.None, 0f);
+                var youDied = "you died.";
+                var size = _font.MeasureString(youDied);
+                  _spriteBatch.DrawString(_font, youDied, new Vector2 {Y = Height - size.Y, X = Width - size.X/2}, Color.White);
+
+                var pressEnterToRestart = "press enter to restart";
+                size = _font.MeasureString(pressEnterToRestart);
+                _spriteBatch.DrawString(_font, pressEnterToRestart, new Vector2 {Y = Height + 10, X = Width - size.X/4}, Color.White, 0f, Vector2.Zero, new Vector2(0.5f), SpriteEffects.None, 0f);
             }
             _spriteBatch.End();
 
