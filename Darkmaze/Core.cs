@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using MazeGeneration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,8 +18,8 @@ namespace Darkmaze
         private uint[] _pixels;
         private Texture2D _canvas;
         private WaveEngine _engine;
-        private const int Width = 200;
-        private const int Height = 200;
+        private const int Width = 300;
+        private const int Height = 300;
 
         public Core()
         {
@@ -42,16 +43,27 @@ namespace Darkmaze
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _engine = new WaveEngine(Height);
-            var maze = new Maze(100, 100);
-            for (int x = 0; x < 100; x++)
+            var mfactor = 30;
+            var msize = Height / mfactor;
+            if(Height%mfactor != 0)
+                Debugger.Break();
+            var maze = new Maze(msize, msize);
+            for (int x = 0; x < msize; x++)
             {
-                for (int y = 0; y < 100; y++)
+                for (int y = 0; y < msize; y++)
                 {
                     if ((maze[x, y] & CellState.Right) != 0)
-                        _engine.SetWall(x * 2 + 1, y * 2);
+                    {
+                        for (int i = 0; i < mfactor - 1; i++)
+                            _engine.SetWall(x * mfactor + mfactor - 1, y * mfactor + i);
+                    }
                     if ((maze[x, y] & CellState.Bottom) != 0)
-                        _engine.SetWall(x * 2, y * 2 + 1);
-                    _engine.SetWall(x * 2 + 1, y * 2 + 1);
+                    {
+                        for (int i = 0; i < mfactor - 1; i++)
+                            _engine.SetWall(x * mfactor + i, y * mfactor + mfactor - 1);
+                    }
+                    
+                    _engine.SetWall(x * mfactor + mfactor - 1, y * mfactor + mfactor - 1);
                 }
             }
             _engine.Oscillator1Position = new Point(100, 100);
