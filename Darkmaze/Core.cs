@@ -18,8 +18,8 @@ namespace Darkmaze
         private uint[] _pixels;
         private Texture2D _canvas;
         private WaveEngine _engine;
-        private const int Width = 300;
-        private const int Height = 300;
+        private const int Width = 30*10;
+        private const int Height = 30*10;
 
         public Core()
         {
@@ -72,6 +72,8 @@ namespace Darkmaze
             base.Initialize();
         }
 
+        private KeyboardState _prevState = new KeyboardState();
+        private int _waveCoolDown;
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -90,15 +92,22 @@ namespace Darkmaze
             if (keys.IsKeyDown(Keys.Right) && !_engine.IsWall(pos.X + 1, pos.Y))
                 _engine.Oscillator1Position = new Point(pos.X + 1, pos.Y);
 
-            if (keys.IsKeyDown(Keys.Space))
+            if (keys.IsKeyDown(Keys.Space) && _prevState.IsKeyDown(Keys.Space))
+            {
                 _engine.Oscillator1Active = true;
-            else
+                _engine.phase1 = 0f;
+                _waveCoolDown = (int)(MathHelper.TwoPi / _engine.PhaseRate1); //do one full oscilation
+            }
+            if(_waveCoolDown-- == 0)
+            {
                 _engine.Oscillator1Active = false;
+            }
 
 
             _engine.OneStep(_pixels);
             _canvas.SetData(_pixels, 0, Width * Height);
 
+            _prevState = keys;
             base.Update(gameTime);
         }
         

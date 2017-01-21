@@ -17,15 +17,12 @@ namespace WaveSimulator
 
         float mass = 0.1f; // Mass of each particle. It is the same for all particles.
         float action_resolution = 20f; // Resolution of movement of particles.
-        float sustain = 30f; // Anti-damping. Propagation range increases by increasing this variable. Minimum is 1f.
-        float phase1 = 0f; // Current phase value of oscillator1.
-        float phase2 = 0f; // Current phase value of oscillator2.
+        float sustain = 40f; // Anti-damping. Propagation range increases by increasing this variable. Minimum is 1f.
+        public float phase1 = 0f; // Current phase value of oscillator1.
 
         bool osc1active = false; // Is oscillator1 is turned on?
-        bool osc2active = false; // Is oscillator2 is turned on?
 
         int osc1point = 0; // Location of the oscillator1 in the wave pool. It is an index value.
-        int osc2point = 0; // Location of the oscillator2 in the wave pool. It is an index value.
 
         int size = 200; // Size of the wave pool. It indicates both the width and height since the pool will always be a square.
 
@@ -155,16 +152,6 @@ namespace WaveSimulator
                 SetSustain();
             }
         }
-
-        public bool Oscillator2Active
-        {
-            get { return osc2active; }
-            set
-            {
-                osc2active = value;
-                SetSustain();
-            }
-        }
         
         public Point Oscillator1Position
         {
@@ -179,19 +166,6 @@ namespace WaveSimulator
             }
         }
 
-        public Point Oscillator2Position
-        {
-            get { return new Point(osc2point % size, (int)Math.Floor((float)osc2point / (float)size)); }
-            set
-            {
-                if (value.X + value.Y * size < size * size)
-                {
-                    osc2point = value.X + value.Y * size;
-                    SetSustain();
-                }
-            }
-        }
-
         /// <summary>
         /// Initializes the WaveEngine
         /// </summary>
@@ -199,7 +173,7 @@ namespace WaveSimulator
         public WaveEngine(int size)
         {
             this.size = size;
-            ColorStatic = new Color(color1 + color2 / 2);
+            ColorStatic = new Color((color1 + color2) / 2);
             SetPool();
         }
 
@@ -368,18 +342,6 @@ namespace WaveSimulator
                     phase1 += PhaseRate1;
                     if (phase1 >= 2f * (float) Math.PI)
                         phase1 -= (float) Math.PI * 2f;
-
-                    goto cont;
-                }
-
-                if (index == osc2point && osc2active)
-                {
-                    vdv[index] = 0;
-                    vda[index] = 0;
-                    vd[index] = (float) Math.Sin(phase2);
-                    phase2 += PhaseRate2;
-                    if (phase2 >= 2f * (float) Math.PI)
-                        phase2 -= (float) Math.PI * 2f;
 
                     goto cont;
                 }
@@ -554,7 +516,7 @@ namespace WaveSimulator
 
                 if (vd_static[index])
                 {
-                    rgbdata[index] = GetPackedValue((color1+color2)/2);
+                    rgbdata[index] = ColorStatic.PackedValue;
                 }
                 else
                 {
