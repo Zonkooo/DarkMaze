@@ -38,6 +38,8 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Primitives2D.cs" />
+    <Compile Include="Enemy.cs" />
     <Compile Include="MazeGenerator.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Program.cs" />
