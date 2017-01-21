@@ -19,18 +19,12 @@ namespace Darkmaze
         private Vector2 _curMove;
         private Vector2 _curDir;
         private float _impactRadius;
-        private Vector2 _center;
-        private float _startingAngle;
-        private float _endingAngle;
         private bool _onTarget;
 
         public void Attack(Point target)
         {
             Target = target.ToVector2();
             Active = true;
-            _center = GetCenter();
-            _startingAngle = GetAngle(Position);
-            _endingAngle = GetAngle(Target);
 
             _curDir = Target - Position;
             _curDir.Normalize();
@@ -68,32 +62,7 @@ namespace Darkmaze
         {
             return Active && (pos - Position).Length() < (_impactRadius/2);
         }
-
-        private Vector2 GetCenter()
-        {
-            var a = Position;
-            var b = Target;
-            float ab = (a - b).Length();
-            float bc = Radius;
-            float ac = Radius;
-
-            var costheta = (bc * bc - ac * ac - ab * ab) / (-2 * ac * ab); //((BC) ^ 2 - (AC) ^ 2 - (AB) ^ 2) / (-2(AC)(AB))
-            var sintheta = (float)Math.Sqrt((1 - (bc * bc - ac * ac - ab * ab)) / ((-2 * ac * ab) * (-2 * ac * ab))); //sqrt(1-((BC)^2 - (AC)^2 - (AB)^2)/(-2 (AC)(AB))^2)
-
-            var v1 = (costheta * (b.X - a.X) + sintheta * (b.Y - a.Y)) / ab; //(cos(theta)*(x2-x1) + sin(theta)*(y2-y1))/(AB)
-            var v2 = (costheta * (b.Y - a.Y) - sintheta * (b.X - a.X)) / ab; //(cos(theta)*(y2-y1) - sin(theta)*(x2-x1))/(AB)
-
-            var c = a + new Vector2(v1, v2);
-            return c;
-        }
-
-        private float GetAngle(Vector2 p)
-        {
-            var point = p - _center;
-            point.Normalize();
-            return MathHelper.TwoPi - (float)Math.Atan2(point.Y, point.X);
-        }
-
+        
         public void Draw(SpriteBatch sb)
         {
             if (Active)
