@@ -130,9 +130,7 @@ namespace WaveSimulator
             }
         }
         public Color ColorStatic { get; set; }
-
-        public bool HighContrast { get; set; } = false;
-
+        
         public bool EdgeAbsorbtion
         {
             get { return edge_absorbtion; }
@@ -173,7 +171,7 @@ namespace WaveSimulator
         public WaveEngine(int size)
         {
             this.size = size;
-            ColorStatic = new Color((color1 + color2) / 2);
+            ColorStatic = new Color(color1 / 2);
             SetPool();
         }
 
@@ -405,24 +403,9 @@ namespace WaveSimulator
                 }
                 else
                 {
-                    if (HighContrast)
-                    {
-                        if (vd[index] > 0)
-                        {
-                            rgbdata[index] = GetPackedValue(color1);
-                        }
-                        else
-                        {
-                            rgbdata[index] = GetPackedValue(color2);
-                        }
-                    }
-                    else
-                    {
-                        float brightr1 = bright / 255f;
-                        float brightr2 = 1f - brightr1;
-                        var c = color1 * brightr1 + color2 * brightr2;
-                        rgbdata[index] = GetPackedValue(c);
-                    }
+                    float brightr1 = bright / 255f;
+                    var c = color1 * brightr1;
+                    rgbdata[index] = GetPackedValue(c);
                 }
             }
             
