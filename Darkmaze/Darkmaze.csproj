@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Content\Font.spritefont" />
+    <None Include="Content\roar" />
     <None Include="packages.config" />
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>

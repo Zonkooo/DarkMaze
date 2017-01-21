@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using MazeGeneration;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using WaveSimulator;
@@ -17,6 +18,7 @@ namespace Darkmaze
         GraphicsDeviceManager graphics;
         SpriteBatch _spriteBatch;
         SpriteFont _font;
+        SoundEffect _roar;
 
         private uint[] _pixels;
         private Texture2D _canvas;
@@ -26,6 +28,7 @@ namespace Darkmaze
         private const int Mfactor = 25; //width of the alleys
         private const int Width = Mfactor * 10 + 1;
         private const int Height = Mfactor * 10 + 1;
+        private const int NbEnemies = 20;
 
         public Core()
         {
@@ -47,6 +50,7 @@ namespace Darkmaze
         protected override void Initialize()
         {
             _font = Content.Load<SpriteFont>("Font");
+            _roar = Content.Load<SoundEffect>("roar");
 
             _canvas = new Texture2D(GraphicsDevice, Width, Height, false, SurfaceFormat.Color);
 
@@ -57,7 +61,7 @@ namespace Darkmaze
             base.Initialize();
         }
 
-        private void NewLevel()
+        private void NewLevel(bool withWalls = true)
         {
             _pixels = new uint[Width * Height];
             _engine = new WaveEngine(Height);
@@ -66,30 +70,34 @@ namespace Darkmaze
                 Debugger.Break();
 
             //place walls
-            var maze = new Maze(msize, msize);
-            for (int x = 0; x < msize; x++)
+            if (withWalls)
             {
-                for (int y = 0; y < msize; y++)
+                var maze = new Maze(msize, msize);
+                for (int x = 0; x < msize; x++)
                 {
-                    if ((maze[x, y] & CellState.Right) != 0)
+                    for (int y = 0; y < msize; y++)
                     {
-                        for (int i = 0; i < Mfactor - 1; i++)
-                            _engine.SetWall(x * Mfactor + Mfactor, y * Mfactor + i + 1);
-                    }
-                    if ((maze[x, y] & CellState.Bottom) != 0)
-                    {
-                        for (int i = 0; i < Mfactor - 1; i++)
-                            _engine.SetWall(x * Mfactor + i + 1, y * Mfactor + Mfactor);
-                    }
+                        if ((maze[x, y] & CellState.Right) != 0)
+                        {
+                            for (int i = 0; i < Mfactor - 1; i++)
+                                _engine.SetWall(x * Mfactor + Mfactor, y * Mfactor + i + 1);
+                        }
+                        if ((maze[x, y] & CellState.Bottom) != 0)
+                        {
+                            for (int i = 0; i < Mfactor - 1; i++)
+                                _engine.SetWall(x * Mfactor + i + 1, y * Mfactor + Mfactor);
+                        }
 
-                    _engine.SetWall(x * Mfactor + Mfactor, y * Mfactor + Mfactor);
+                        _engine.SetWall(x * Mfactor + Mfactor, y * Mfactor + Mfactor);
+                    }
                 }
             }
-
             for (int i = 0; i < _engine.Size; i++)
             {
                 _engine.SetWall(i, 0);
                 _engine.SetWall(0, i);
+                _engine.SetWall(_engine.Size - 1, i);
+                _engine.SetWall(i, _engine.Size - 1);
             }
 
             _engine.Oscillator1Position = new Point(Mfactor/2, Mfactor/ 2);
@@ -97,7 +105,7 @@ namespace Darkmaze
             //place enemies
             var rand = new Random();
             _enemies = new List<Enemy>();
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < NbEnemies; i++)
             {
                 Point position;
                 do
@@ -172,6 +180,7 @@ namespace Darkmaze
                 {
                     //jump on player
                     enemy.Attack(_source, wavePower);
+                    _roar.Play();
                 }
                 enemy.Update();
             }
@@ -196,6 +205,7 @@ namespace Darkmaze
         }
 
         static Random _rand = new Random();
+
         public static double FakeGaussianRandom(float mean, float stdev)
         {
             double u1 = _rand.NextDouble();

@@ -19,3 +19,9 @@
 /processorParam:TextureFormat=Compressed
 /build:Font.spritefont
 
+#begin roar
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:roar
+
