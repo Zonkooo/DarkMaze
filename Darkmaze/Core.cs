@@ -21,16 +21,19 @@ namespace Darkmaze
         private uint[] _pixels;
         private Texture2D _canvas;
         private WaveEngine _engine;
-        private List<Enemy> _enemies = new List<Enemy>();
+        private List<Enemy> _enemies;
 
         private const int Width = 30*10;
         private const int Height = 30*10;
 
         public Core()
         {
+            this.IsMouseVisible = true;
+
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = Width*2;
             graphics.PreferredBackBufferHeight = Height*2;
+            
             Content.RootDirectory = "Content";
         }
 
@@ -45,14 +48,21 @@ namespace Darkmaze
             _font = Content.Load<SpriteFont>("Font");
 
             _canvas = new Texture2D(GraphicsDevice, Width, Height, false, SurfaceFormat.Color);
-            _pixels = new uint[Width * Height];
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            
+            NewLevel();
 
+            base.Initialize();
+        }
+
+        private void NewLevel()
+        {
+            _pixels = new uint[Width * Height];
             _engine = new WaveEngine(Height);
             var mfactor = 30;
             var msize = Height / mfactor;
-            if(Height%mfactor != 0)
+            if (Height % mfactor != 0)
                 Debugger.Break();
             var maze = new Maze(msize, msize);
             for (int x = 0; x < msize; x++)
@@ -69,25 +79,26 @@ namespace Darkmaze
                         for (int i = 0; i < mfactor - 1; i++)
                             _engine.SetWall(x * mfactor + i, y * mfactor + mfactor - 1);
                     }
-                    
+
                     _engine.SetWall(x * mfactor + mfactor - 1, y * mfactor + mfactor - 1);
                 }
             }
-            _engine.Oscillator1Position = new Point(Width/2, Height/2);
+            _engine.Oscillator1Position = new Point(Width / 2, Height / 2);
 
             var rand = new Random();
+            _enemies = new List<Enemy>();
             for (int i = 0; i < 10; i++)
             {
                 Point position;
                 do
                 {
-                    position = new Point {X = rand.Next(Width), Y = rand.Next(Height)};
+                    position = new Point { X = rand.Next(Width), Y = rand.Next(Height) };
                 } while (_engine.IsWall(position.X, position.Y));
 
-                _enemies.Add(new Enemy {Position = position.ToVector2()});
+                _enemies.Add(new Enemy { Position = position.ToVector2() });
             }
 
-            base.Initialize();
+            _dead = false;
         }
 
         private KeyboardState _prevState = new KeyboardState();
@@ -133,6 +144,15 @@ namespace Darkmaze
                         _dead = true;
                 }
             }
+            else
+            {
+                if (keys.IsKeyDown(Keys.Enter))
+                {
+                    NewLevel();
+                    base.Update(gameTime);
+                    return;
+                }
+            }
 
             foreach (var enemy in _enemies)
             {
@@ -145,8 +165,11 @@ namespace Darkmaze
                 enemy.Update();
             }
 
-            _engine.OneStep(_pixels);
-            _canvas.SetData(_pixels, 0, Width * Height);
+            if (!_dead)
+            {
+                _engine.OneStep(_pixels);
+                _canvas.SetData(_pixels, 0, Width * Height);
+            }
 
             _prevState = keys;
             base.Update(gameTime);
@@ -158,22 +181,22 @@ namespace Darkmaze
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            GraphicsDevice.Clear(Color.Red);
+
             _spriteBatch.Begin();
-            
-            _spriteBatch.Draw(_canvas, new Rectangle(0, 0, Width*2, Height*2), Color.White);
-            
-            foreach (var enemy in _enemies)
-                enemy.Draw(_spriteBatch);
-
-            _spriteBatch.End();
-
-            if (_dead)
+            if (!_dead)
             {
-                GraphicsDevice.Clear(Color.Red);
-                _spriteBatch.Begin();
-                _spriteBatch.DrawString(_font, "you died.", new Vector2 {X = 235, Y = 275}, Color.White);
-                _spriteBatch.End();
+                _spriteBatch.Draw(_canvas, new Rectangle(0, 0, Width * 2, Height * 2), Color.White);
+
+                foreach (var enemy in _enemies)
+                    enemy.Draw(_spriteBatch);
             }
+            else
+            {
+                _spriteBatch.DrawString(_font, "you died.", new Vector2 {X = 220, Y = 268}, Color.White);
+                _spriteBatch.DrawString(_font, "press enter to restart", new Vector2 {X = 210, Y = 315}, Color.White, 0f, Vector2.Zero, new Vector2(0.5f), SpriteEffects.None, 0f);
+            }
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }
