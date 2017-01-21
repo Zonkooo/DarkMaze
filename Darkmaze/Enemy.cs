@@ -11,7 +11,10 @@ namespace Darkmaze
 {
     public class Enemy
     {
-        private const int Radius = 80;
+        private const float ImpactSpeed = 1f;
+        private const int MaxRadius = 30;
+        private const float MoveSpeed = 1f;
+
         public Vector2 Position { get; set; }
         public bool Active { get; set; }
         public Vector2 Target { get; set; }
@@ -28,6 +31,7 @@ namespace Darkmaze
 
             _curDir = Target - Position;
             _curDir.Normalize();
+            _curDir *= MoveSpeed;
             _curMove = new Vector2();
             _impactRadius = 0;
             _onTarget = false;
@@ -49,9 +53,9 @@ namespace Darkmaze
                         Position = Target;
                         _curMove = Vector2.Zero;
                     }
-                    _impactRadius++;
+                    _impactRadius += ImpactSpeed;
                 }
-                if (_impactRadius >= 30)
+                if (_impactRadius >= MaxRadius)
                 {
                     Active = false;
                 }
@@ -67,7 +71,6 @@ namespace Darkmaze
         {
             if (Active)
             {
-//                sb.DrawArc(_center, Radius, 8, _startingAngle, _endingAngle, Color.Red);
                 sb.DrawLine(Position*2, (Position+_curMove)*2, Color.Red);
                 if(_impactRadius > 1)
                     sb.DrawCircle(Target*2, _impactRadius, 16, Color.Red);
