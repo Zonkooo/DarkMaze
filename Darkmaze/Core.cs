@@ -167,10 +167,11 @@ namespace Darkmaze
             foreach (var enemy in _enemies)
             {
                 //update enemies
-                if (!enemy.Active && Math.Abs(_engine.GetAmplitude((int) enemy.Position.X, (int) enemy.Position.Y)) > 0.02f)
+                var wavePower = Math.Abs(_engine.GetAmplitude((int) enemy.Position.X, (int) enemy.Position.Y));
+                if (!enemy.Active && wavePower > 0.02f)
                 {
                     //jump on player
-                    enemy.Attack(_source);
+                    enemy.Attack(_source, wavePower);
                 }
                 enemy.Update();
             }
@@ -178,11 +179,29 @@ namespace Darkmaze
             if (!_dead)
             {
                 _engine.OneStep(_pixels);
+                //AddNoise(_pixels);
                 _canvas.SetData(_pixels, 0, Width * Height);
             }
 
             _prevState = keys;
             base.Update(gameTime);
+        }
+
+        private void AddNoise(uint[] pixels)
+        {
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                //add gaussian random
+            }
+        }
+
+        static Random _rand = new Random();
+        public static double FakeGaussianRandom(float mean, float stdev)
+        {
+            double u1 = _rand.NextDouble();
+            double u2 = _rand.NextDouble();
+            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
+            return stdev * randStdNormal;
         }
 
         /// <summary>

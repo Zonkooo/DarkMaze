@@ -197,8 +197,6 @@ namespace WaveSimulator
 
         void CalculateForces()
         {
-            float total_height = 0;// This will be used to shift the height center of the whole particle system to the origin.
-
             // This loop calculates the forces exerted on the particles.
             //Parallel.For(0, vd.Length, new ParallelOptions {MaxDegreeOfParallelism = 4}, index =>
             for (int index = 0; index < vd.Length; index += 1)
@@ -232,11 +230,7 @@ namespace WaveSimulator
 
                 // Reset the acceleration. We do this because acceleration dynamically changes with the force.
                 vda[index] = 0;
-
-                // Sum up all the height values so we will find the average height of the system.
-                // This doesn't contribute to the force calculation. It is immaterial.
-                total_height += vd[index];
-
+                
                 // Now we will find out the average height of the 8 neighbor particles.
                 // So we will know where the current particle will be attracted to.
 
@@ -413,10 +407,11 @@ namespace WaveSimulator
 
         private static uint GetPackedValue(Vector3 c)
         {
-            uint i = 0xFF000000;           //A
+            uint i = 0;
             i += (uint) (c.Z * 255) << 16; //B
             i += (uint) (c.Y * 255) << 8;  //G
             i += (uint) (c.X * 255);       //R
+            i |= 0xFF000000;               //A
             return i;
         }
 

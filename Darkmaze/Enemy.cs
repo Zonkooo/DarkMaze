@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using C3.XNA;
+﻿using C3.XNA;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -24,9 +19,11 @@ namespace Darkmaze
         private float _impactRadius;
         private bool _onTarget;
 
-        public void Attack(Point target)
+        public void Attack(Point target, float precision)
         {
-            Target = target.ToVector2();
+            //TODO : don't end on on walls or outside of the play area
+            var perturbation = new Vector2((float) Core.FakeGaussianRandom(0f, 10f), (float) Core.FakeGaussianRandom(0f, 10f));
+            Target = target.ToVector2() + perturbation;
             Active = true;
 
             _curDir = Target - Position;
