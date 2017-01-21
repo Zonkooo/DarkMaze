@@ -18,6 +18,7 @@ namespace Darkmaze
         SpriteFont _font;
         SoundEffect _roar;
         Song _success;
+        Texture2D _door;
 
         private int level = 1;
         private uint[] _pixels;
@@ -25,7 +26,7 @@ namespace Darkmaze
         private WaveEngine _engine;
         private List<Enemy> _enemies;
 
-        private Rectangle winningZone = new Rectangle(Width-Mfactor/2, Height-Mfactor/2, Mfactor/2, Mfactor/2);
+        private Rectangle winningZone = new Rectangle(Width-Mfactor/2, Height-Mfactor, Mfactor/2, Mfactor);
 
         private const int Mfactor = 25; //width of the alleys
         private const int Width = Mfactor * 10 + 1;
@@ -48,6 +49,7 @@ namespace Darkmaze
             _font = Content.Load<SpriteFont>("Font");
             _roar = Content.Load<SoundEffect>("roar");
             _success = Content.Load<Song>("wave");
+            _door = Content.Load<Texture2D>("door_small");
 
             _canvas = new Texture2D(GraphicsDevice, Width, Height, false, SurfaceFormat.Color);
 
@@ -211,7 +213,7 @@ namespace Darkmaze
 
         static Random _rand = new Random();
 
-        public static double FakeGaussianRandom(float mean, float stdev)
+        public static double FakeGaussianRandom(float stdev)
         {
             double u1 = _rand.NextDouble();
             double u2 = _rand.NextDouble();
@@ -275,6 +277,7 @@ namespace Darkmaze
                     var help = "Shh !";
                     _spriteBatch.DrawString(_font, help, new Vector2 { Y = Height * 2 - 50, X = 20 }, Color.White);
                 }
+                _spriteBatch.Draw(_door, new Vector2(Width*2-72, Height*2-72));
             }
             _spriteBatch.End();
 

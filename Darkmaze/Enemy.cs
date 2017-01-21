@@ -22,7 +22,7 @@ namespace Darkmaze
         public void Attack(Point target, float precision)
         {
             //TODO : don't end on on walls or outside of the play area
-            var perturbation = new Vector2((float) Core.FakeGaussianRandom(0f, 10f), (float) Core.FakeGaussianRandom(0f, 10f));
+            var perturbation = new Vector2((float) Core.FakeGaussianRandom(8f), (float) Core.FakeGaussianRandom(8f));
             Target = target.ToVector2() + perturbation;
             Active = true;
 

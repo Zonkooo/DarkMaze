@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\door_small.png" />
     <Content Include="Content\wave.mp3" />
     <Content Include="Icon.ico" />
   </ItemGroup>
