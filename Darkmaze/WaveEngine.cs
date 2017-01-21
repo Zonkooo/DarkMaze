@@ -183,64 +183,6 @@ namespace WaveSimulator
             Generatebitmap(buffer);
         }
         
-        /// <summary>
-        /// Sets particles' specified attribute(s) to a specified value in a specified rectangular area.
-        /// </summary>
-        /// <param name="rect">Rectangular area which contains particles.</param>
-        /// <param name="value">Value to set the particles to.</param>
-        /// <param name="partatt">Attribute(s) that will be set.</param>
-        public void SetParticles(Rectangle rect, float value, ParticleAttribute partatt)
-        {
-            if (rect.X < 0)
-                rect.X = 0;
-
-            if (rect.Y < 0)
-                rect.Y = 0;
-
-            if (rect.Width + rect.X > size)
-                rect.Width -= (rect.X + rect.Width) - size;
-
-            if (rect.Height + rect.Y > size)
-                rect.Height -= (rect.Y + rect.Height) - size;
-
-            bool xh = false, xv = false, xa = false, xs = false, xf = false;
-            // Let's see which attributes we are gonna deal with.
-            if ((ParticleAttribute.All & partatt) == ParticleAttribute.All)
-            {
-                xh = true; xv = true; xa = true; xs = true; xf = true;
-            }
-            else
-            {
-                if ((ParticleAttribute.Height & partatt) == ParticleAttribute.Height)
-                    xh = true;
-                if ((ParticleAttribute.Velocity & partatt) == ParticleAttribute.Velocity)
-                    xv = true;
-                if ((ParticleAttribute.Acceleration & partatt) == ParticleAttribute.Acceleration)
-                    xa = true;
-                if ((ParticleAttribute.Sustainability & partatt) == ParticleAttribute.Sustainability)
-                    xs = true;
-                if ((ParticleAttribute.Fixity & partatt) == ParticleAttribute.Fixity)
-                    xf = true;
-            }
-
-            for (int y = rect.Y * size; y < rect.Y * size + rect.Height * size; y += size)
-            {
-                for (int x = rect.X; x < rect.X + rect.Width; x++)
-                {
-                    if (xh)
-                        vd[x + y] = value;
-                    if (xv)
-                        vdv[x + y] = value;
-                    if (xa)
-                        vda[x + y] = value;
-                    if (xs)
-                        vds[x + y] = value;
-                    if (xf)
-                        vd_static[x + y] = Convert.ToBoolean(value);
-                }
-            }
-        }
-
         public void SetWall(int x, int y)
         {
             vd_static[x + y*size] = true;
@@ -251,66 +193,9 @@ namespace WaveSimulator
             return vd_static[x + y * size];
         }
 
-        /// <summary>
-        /// Gives a float array of specified attribute of particles in a specified rectangular area.
-        /// </summary>
-        /// <param name="rect">Rectangular area which contains particles.</param>
-        /// <param name="partatt">Attribute whose array will be given. Only one attribute can be specified and "All" cannot be specified.</param>
-        public float[] GetParticles(Rectangle rect, ParticleAttribute partatt)
+        public float GetAmplitude(int x, int y)
         {
-            float[] result = new float[1];
-
-            bool xh = false, xv = false, xa = false, xs = false, xf = false;
-
-            if ((int)partatt == 1 || (int)partatt == 2 || (int)partatt == 4 || (int)partatt == 8 || (int)partatt == 16)
-            {
-
-                if (rect.X < 0)
-                    rect.X = 0;
-
-                if (rect.Y < 0)
-                    rect.Y = 0;
-
-                if (rect.Width + rect.X > size)
-                    rect.Width -= (rect.X + rect.Width) - size;
-
-                if (rect.Height + rect.Y > size)
-                    rect.Height -= (rect.Y + rect.Height) - size;
-
-                result = new float[rect.Width * rect.Height];
-
-                if (partatt == ParticleAttribute.Height)
-                    xh = true;
-                if (partatt == ParticleAttribute.Velocity)
-                    xv = true;
-                if (partatt == ParticleAttribute.Acceleration)
-                    xa = true;
-                if (partatt == ParticleAttribute.Sustainability)
-                    xs = true;
-                if (partatt == ParticleAttribute.Fixity)
-                    xf = true;
-
-                int r = 0;
-                for (int y = rect.Y * size; y < rect.Y * size + rect.Height * size; y += size)
-                {
-                    for (int x = rect.X; x < rect.X + rect.Width; x++)
-                    {
-                        if (xh)
-                            result[r] = vd[x + y];
-                        if (xv)
-                            result[r] = vdv[x + y];
-                        if (xa)
-                            result[r] = vda[x + y];
-                        if (xs)
-                            result[r] = vds[x + y];
-                        if (xf)
-                            result[r] = Convert.ToSingle(vd_static[x + y]);
-                        r += 1;
-                    }
-                }
-            }
-
-            return result;
+            return vd[x + y * size];
         }
 
         void CalculateForces()
@@ -478,7 +363,7 @@ namespace WaveSimulator
             // Now we have finished with the force calculation.
 
             // Origin height is zero. So "shifting" is the distance between the system average height and the origin.
-            float shifting = -total_height / (float)vd.Length;
+//            float shifting = -total_height / (float)vd.Length;
 
 
 
@@ -497,7 +382,7 @@ namespace WaveSimulator
 
 
                 // Here is the last step on shifting the whole system to the origin point.
-                vd[index] += shifting;
+//                vd[index] += shifting;
 
 
             }
