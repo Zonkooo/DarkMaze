@@ -111,7 +111,7 @@ namespace Darkmaze
                 if (keys.IsKeyDown(Keys.Right) && !_engine.IsWall(pos.X + 1, pos.Y))
                     _engine.Oscillator1Position = new Point(pos.X + 1, pos.Y);
 
-                if (keys.IsKeyDown(Keys.Space) && _prevState.IsKeyDown(Keys.Space))
+                if (keys.IsKeyDown(Keys.Space) && _prevState.IsKeyDown(Keys.Space) && !_engine.Oscillator1Active)
                 {
                     _source = _engine.Oscillator1Position;
                     _engine.Oscillator1Active = true;

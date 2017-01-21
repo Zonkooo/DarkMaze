@@ -22,6 +22,7 @@ namespace Darkmaze
         private Vector2 _center;
         private float _startingAngle;
         private float _endingAngle;
+        private bool _onTarget;
 
         public void Attack(Point target)
         {
@@ -35,6 +36,7 @@ namespace Darkmaze
             _curDir.Normalize();
             _curMove = new Vector2();
             _impactRadius = 0;
+            _onTarget = false;
         }
         
         public void Update()
@@ -47,12 +49,17 @@ namespace Darkmaze
                 }
                 else
                 {
+                    if (!_onTarget)
+                    {
+                        _onTarget = true;
+                        Position = Target;
+                        _curMove = Vector2.Zero;
+                    }
                     _impactRadius++;
                 }
                 if (_impactRadius >= 20)
                 {
                     Active = false;
-                    Position = Target;
                 }
             }
         }
