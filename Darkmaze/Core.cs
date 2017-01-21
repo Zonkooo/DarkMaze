@@ -24,8 +24,8 @@ namespace Darkmaze
         public Core()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = Width;
-            graphics.PreferredBackBufferHeight = Height;
+            graphics.PreferredBackBufferWidth = Width*2;
+            graphics.PreferredBackBufferHeight = Height*2;
             Content.RootDirectory = "Content";
         }
 
@@ -67,7 +67,6 @@ namespace Darkmaze
                 }
             }
             _engine.Oscillator1Position = new Point(100, 100);
-            _engine.Oscillator1Active = true;
 
 
             base.Initialize();
@@ -80,19 +79,21 @@ namespace Darkmaze
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
             var keys = Keyboard.GetState();
             var pos = _engine.Oscillator1Position;
-            if (keys.IsKeyDown(Keys.Up))
+            if (keys.IsKeyDown(Keys.Up) && !_engine.IsWall(pos.X, pos.Y - 1))
                 _engine.Oscillator1Position = new Point(pos.X, pos.Y - 1);
-            if (keys.IsKeyDown(Keys.Down))
+            if (keys.IsKeyDown(Keys.Down) && !_engine.IsWall(pos.X, pos.Y + 1))
                 _engine.Oscillator1Position = new Point(pos.X, pos.Y + 1);
-            if (keys.IsKeyDown(Keys.Left))
+            if (keys.IsKeyDown(Keys.Left) && !_engine.IsWall(pos.X - 1, pos.Y))
                 _engine.Oscillator1Position = new Point(pos.X - 1, pos.Y);
-            if (keys.IsKeyDown(Keys.Right))
+            if (keys.IsKeyDown(Keys.Right) && !_engine.IsWall(pos.X + 1, pos.Y))
                 _engine.Oscillator1Position = new Point(pos.X + 1, pos.Y);
+
+            if (keys.IsKeyDown(Keys.Space))
+                _engine.Oscillator1Active = true;
+            else
+                _engine.Oscillator1Active = false;
 
 
             _engine.OneStep(_pixels);
@@ -100,7 +101,7 @@ namespace Darkmaze
 
             base.Update(gameTime);
         }
-
+        
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
@@ -110,7 +111,7 @@ namespace Darkmaze
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
-            spriteBatch.Draw(_canvas, new Rectangle(0, 0, Width, Height), Color.White);
+            spriteBatch.Draw(_canvas, new Rectangle(0, 0, Width*2, Height*2), Color.White);
             spriteBatch.End();
 
             base.Draw(gameTime);

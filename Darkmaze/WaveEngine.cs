@@ -346,6 +346,11 @@ namespace WaveSimulator
             vd_static[x + y*size] = true;
         }
 
+        public bool IsWall(int x, int y)
+        {
+            return vd_static[x + y * size];
+        }
+
         /// <summary>
         /// Gives a float array of specified attribute of particles in a specified rectangular area.
         /// </summary>
@@ -646,7 +651,7 @@ namespace WaveSimulator
             {
                 // Brightness. This value is the 'brightness' of the height.
                 // Now we see why "limit" makes sense.
-                byte bright = (byte)(((float)vd[index] + limit) / (float)((limit * 2f) / 255f));
+                byte bright = (byte)((vd[index] + limit) / (limit * 2f / 255f));
 
                 if (vd_static[index])
                 {
@@ -680,10 +685,10 @@ namespace WaveSimulator
 
         private static uint GetPackedValue(Vector3 c)
         {
-            uint i = 0xFF000000;
-            i += (uint) (c.Z * 255) << 16;
-            i += (uint) (c.Y * 255) << 8;
-            i += (uint) (c.X * 255);
+            uint i = 0xFF000000;           //A
+            i += (uint) (c.Z * 255) << 16; //B
+            i += (uint) (c.Y * 255) << 8;  //G
+            i += (uint) (c.X * 255);       //R
             return i;
         }
 
