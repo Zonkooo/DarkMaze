@@ -72,7 +72,7 @@ namespace Darkmaze
 
             base.Initialize();
         }
-        
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -82,7 +82,19 @@ namespace Darkmaze
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            
+
+            var keys = Keyboard.GetState();
+            var pos = _engine.Oscillator1Position;
+            if (keys.IsKeyDown(Keys.Up))
+                _engine.Oscillator1Position = new Point(pos.X, pos.Y - 1);
+            if (keys.IsKeyDown(Keys.Down))
+                _engine.Oscillator1Position = new Point(pos.X, pos.Y + 1);
+            if (keys.IsKeyDown(Keys.Left))
+                _engine.Oscillator1Position = new Point(pos.X - 1, pos.Y);
+            if (keys.IsKeyDown(Keys.Right))
+                _engine.Oscillator1Position = new Point(pos.X + 1, pos.Y);
+
+
             _engine.OneStep(_pixels);
             _canvas.SetData(_pixels, 0, Width * Height);
 

@@ -45,8 +45,8 @@ namespace WaveSimulator
 
         int size = 200; // Size of the wave pool. It indicates both the width and height since the pool will always be a square.
 
-        Vector3 color1 = Color.Black.ToVector3(); // Color of the crest or trough.
-        Vector3 color2 = Color.Cyan.ToVector3(); // Color of the crest or trough. 
+        Vector3 color1 = Color.Lime.ToVector3(); // Color of the crest or trough.
+        Vector3 color2 = Color.Red.ToVector3(); // Color of the crest or trough. 
 
         Color colorstatic = Color.Yellow; // Color of the static particles.
 
@@ -240,10 +240,10 @@ namespace WaveSimulator
                 setSustain();
             }
         }
-
+        
         public Point Oscillator1Position
         {
-            get { return new Point(osc1point % size, (int)Math.Floor((float)osc1point / (float)size)); }
+            get { return new Point(osc1point % size, osc1point/size); }
             set
             {
                 if (value.X + value.Y * size < size * size)
@@ -650,7 +650,7 @@ namespace WaveSimulator
 
                 if (vd_static[index])
                 {
-                    rgbdata[index] = ColorStatic.PackedValue;
+                    rgbdata[index] = GetPackedValue((color1+color2)/2);
                 }
                 else
                 {
@@ -668,8 +668,8 @@ namespace WaveSimulator
                     }
                     else
                     {
-                        float brightr1 = (float)bright / 255f;
-                        float brightr2 = 1f - (float)bright / 255f;
+                        float brightr1 = bright / 255f;
+                        float brightr2 = 1f - brightr1;
                         var c = color1 * brightr1 + color2 * brightr2;
                         rgbdata[index] = GetPackedValue(c);
                     }
@@ -681,9 +681,9 @@ namespace WaveSimulator
         private static uint GetPackedValue(Vector3 c)
         {
             uint i = 0xFF000000;
-            i += (uint) (c.X * 255) << 24;
-            i += (uint) (c.Y * 255) << 16;
-            i += (uint) (c.Z * 255) << 8;
+            i += (uint) (c.Z * 255) << 16;
+            i += (uint) (c.Y * 255) << 8;
+            i += (uint) (c.X * 255);
             return i;
         }
 

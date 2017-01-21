@@ -6,6 +6,7 @@ using System.Text;
 using System.Drawing;
 using Microsoft.Xna.Framework;
 
+// source : http://rosettacode.org/wiki/Maze_generation#C.23
 namespace MazeGeneration
 {
     public static class Extensions
