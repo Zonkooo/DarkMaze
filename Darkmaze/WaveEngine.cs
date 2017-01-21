@@ -27,7 +27,6 @@ namespace WaveSimulator
         int size = 200; // Size of the wave pool. It indicates both the width and height since the pool will always be a square.
 
         readonly Vector3 color1 = Color.White.ToVector3(); // Color of the crest or trough.
-        readonly Vector3 color2 = Color.Black.ToVector3(); // Color of the crest or trough. 
 
 
         // These variables are used for edge absorbtion. It is used for eliminating reflection from window boundaries.
@@ -353,7 +352,7 @@ namespace WaveSimulator
 
                 // Don't let things go beyond their limit.
                 // This makes sense. It eliminates a critic uncertainty.
-                vda[index] = MathHelper.Clamp(vda[index], -1f, 1f);
+//                vda[index] = MathHelper.Clamp(vda[index], -1f, 1f);
 
                 cont:
                 ;
@@ -376,7 +375,8 @@ namespace WaveSimulator
                 // Here is the purpose of "action_resolution":
                 // It is used to divide movements.
                 // If the particle goes along the road at once, a chaos is most likely unavoidable.
-                vd[index] = MathHelper.Clamp(vd[index] + vdv[index] / action_resolution, -1f, 1f);
+                vd[index] = vd[index] + vdv[index] / action_resolution;
+//                vd[index] = MathHelper.Clamp(vd[index] + vdv[index] / action_resolution, -1f, 1f);
 
 
                 // Here is the last step on shifting the whole system to the origin point.
