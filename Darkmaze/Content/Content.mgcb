@@ -19,12 +19,6 @@
 /processorParam:TextureFormat=Compressed
 /build:Font.spritefont
 
-#begin roar
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:roar
-
 #begin wave.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
@@ -43,9 +37,15 @@
 /processorParam:TextureFormat=Color
 /build:door_small.png
 
-#begin clac
+#begin clac.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
-/build:clac
+/build:clac.wav
+
+#begin roar.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:roar.wav
 

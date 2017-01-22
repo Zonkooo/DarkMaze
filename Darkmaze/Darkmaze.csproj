@@ -54,13 +54,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\clac.wav" />
     <Content Include="Content\door_small.png" />
+    <Content Include="Content\roar.wav" />
     <Content Include="Content\wave.mp3" />
     <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Content\Font.spritefont" />
-    <None Include="Content\roar" />
     <None Include="packages.config" />
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
