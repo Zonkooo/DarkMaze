@@ -250,7 +250,7 @@ namespace Darkmaze
                 }
                 else if (level == 3)
                 {
-                    string help = "Now I'll put some obstacles";
+                    string help = "Now I'll put in some obstacles (press enter)";
                     _spriteBatch.DrawString(_font, help, new Vector2 { Y = Height * 2 - 50, X = 20 }, Color.White, 0f, Vector2.Zero, new Vector2(0.5f), SpriteEffects.None, 0f);
                 }
                 else
