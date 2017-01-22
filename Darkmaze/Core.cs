@@ -280,7 +280,7 @@ namespace Darkmaze
                     var help = "Shh !";
                     _spriteBatch.DrawString(_font, help, new Vector2 { Y = Height * 2 - 50, X = 20 }, Color.White);
                 }
-                _spriteBatch.Draw(_door, new Vector2(Width*2-72, Height*2-72));
+                _spriteBatch.Draw(_door, new Vector2(Width*2-72, Height*2-68));
             }
             _spriteBatch.End();
 
