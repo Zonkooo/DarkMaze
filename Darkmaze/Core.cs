@@ -185,6 +185,7 @@ namespace Darkmaze
                 if (keys.IsKeyDown(Keys.Enter))
                 {
                     NewLevel(withWalls:level > 2);
+                    MediaPlayer.Stop();
                     base.Update(gameTime);
                     return;
                 }
@@ -214,17 +215,8 @@ namespace Darkmaze
             _prevState = keys;
             base.Update(gameTime);
         }
-
-        private void AddNoise(uint[] pixels)
-        {
-            for (int i = 0; i < pixels.Length; i++)
-            {
-                //add gaussian random
-            }
-        }
-
+        
         static Random _rand = new Random();
-
         public static double FakeGaussianRandom(float stdev)
         {
             double u1 = _rand.NextDouble();
@@ -267,6 +259,7 @@ namespace Darkmaze
                     var youwin = "y o u  w i n";
                     var size = _font.MeasureString(youwin);
                     _spriteBatch.DrawString(_font, youwin, new Vector2 {Y = Height - size.Y, X = Width - size.X / 2}, new Color(new Vector3(0.4f, 1f, 1f)));
+                    _spriteBatch.DrawString(_font, "(you can press enter to play a new level)", new Vector2 {Y = Height*2 - 30, X = 20}, new Color(new Vector3(0.4f, 1f, 1f)), 0f, Vector2.Zero, new Vector2(0.33f), SpriteEffects.None, 0f);
                 }
             }
             else
