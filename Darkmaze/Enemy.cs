@@ -31,9 +31,11 @@ namespace Darkmaze
 
         public void Attack(Point target, float precision)
         {
-            //TODO : don't end on on walls or outside of the play area
+            //TODO : don't end on on walls
             var perturbation = new Vector2((float) Core.FakeGaussianRandom(8f), (float) Core.FakeGaussianRandom(8f));
-            Target = target.ToVector2() + perturbation;
+            Target = new Vector2(
+                MathHelper.Clamp(target.X + perturbation.X, 1f, Core.Height-1),
+                MathHelper.Clamp(target.Y + perturbation.Y, 1f, Core.Height-1));
             Active = true;
 
             _curDir = Target - Position;

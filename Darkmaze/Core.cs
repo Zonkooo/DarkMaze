@@ -31,8 +31,8 @@ namespace Darkmaze
         private Rectangle winningZone = new Rectangle(Width-Mfactor/2, Height-Mfactor, Mfactor/2, Mfactor);
 
         private const int Mfactor = 25; //width of the alleys
-        private const int Width = Mfactor * 10 + 1;
-        private const int Height = Mfactor * 10 + 1;
+        public const int Width = Mfactor * 10 + 1;
+        public const int Height = Mfactor * 10 + 1;
         private const int NbEnemies = 20;
         private const float DetectionThreshold = 0.022f;
 
