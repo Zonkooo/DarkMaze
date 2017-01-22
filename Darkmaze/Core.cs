@@ -114,13 +114,12 @@ namespace Darkmaze
             _enemies = new List<Enemy>();
             if (withEnemies)
             {
-                var rand = new Random();
                 for (int i = 0; i < NbEnemies; i++)
                 {
                     Point position;
                     do
                     {
-                        position = new Point {X = rand.Next(2*Mfactor, Width), Y = rand.Next(2*Mfactor, Height)};
+                        position = new Point {X = Rand.Next(2*Mfactor, Width), Y = Rand.Next(2*Mfactor, Height)};
                     } while (_engine.IsWall(position.X, position.Y));
 
                     _enemies.Add(new Enemy(_enemyTex) {Position = position.ToVector2()});
@@ -216,11 +215,11 @@ namespace Darkmaze
             base.Update(gameTime);
         }
         
-        static Random _rand = new Random();
+        public static Random Rand = new Random();
         public static double FakeGaussianRandom(float stdev)
         {
-            double u1 = _rand.NextDouble();
-            double u2 = _rand.NextDouble();
+            double u1 = Rand.NextDouble();
+            double u2 = Rand.NextDouble();
             double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
             return stdev * randStdNormal;
         }

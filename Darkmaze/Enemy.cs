@@ -20,10 +20,13 @@ namespace Darkmaze
         private float _impactRadius;
         private bool _onTarget;
         private Texture2D _tex;
+        private Rectangle _texSource;
 
         public Enemy(Texture2D enemyTex)
         {
             _tex = enemyTex;
+            int i = Core.Rand.Next(2);
+            _texSource = new Rectangle(i*32, 0, 32, 32);
         }
 
         public void Attack(Point target, float precision)
@@ -83,7 +86,7 @@ namespace Darkmaze
 
                 var pos = (Position + _curMove) * 2;
                 var angle = MathHelper.Pi - (float)Math.Atan2(_curDir.X, _curDir.Y);
-                sb.Draw(_tex, pos, origin: new Vector2(16, 16), rotation:angle);
+                sb.Draw(_tex, pos, sourceRectangle:_texSource, origin: new Vector2(16, 16), rotation:angle);
             }
         }
     }
