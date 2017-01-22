@@ -48,6 +48,15 @@ namespace Darkmaze
         
         protected override void Initialize()
         {
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            
+            NewLevel(false, false);
+
+            base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
             _font = Content.Load<SpriteFont>("Font");
             _roar = Content.Load<SoundEffect>("roar");
             _clac = Content.Load<SoundEffect>("clac");
@@ -56,11 +65,7 @@ namespace Darkmaze
 
             _canvas = new Texture2D(GraphicsDevice, Width, Height, false, SurfaceFormat.Color);
 
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-            
-            NewLevel(false, false);
-
-            base.Initialize();
+            base.LoadContent();
         }
 
         private void NewLevel(bool withWalls = true, bool withEnemies = true)
