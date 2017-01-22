@@ -52,7 +52,7 @@ namespace Darkmaze
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             
             _enemyTex = Content.Load<Texture2D>("enemy");
-            NewLevel(withWalls:false);
+            NewLevel(false, false);
 
             base.Initialize();
         }
