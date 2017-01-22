@@ -113,7 +113,7 @@ namespace Darkmaze
                     Point position;
                     do
                     {
-                        position = new Point {X = rand.Next(Width), Y = rand.Next(Height)};
+                        position = new Point {X = rand.Next(2*Mfactor, Width), Y = rand.Next(2*Mfactor, Height)};
                     } while (_engine.IsWall(position.X, position.Y));
 
                     _enemies.Add(new Enemy {Position = position.ToVector2()});
