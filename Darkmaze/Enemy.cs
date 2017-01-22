@@ -1,4 +1,5 @@
-﻿using C3.XNA;
+﻿using System;
+using C3.XNA;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -18,6 +19,12 @@ namespace Darkmaze
         private Vector2 _curDir;
         private float _impactRadius;
         private bool _onTarget;
+        private Texture2D _tex;
+
+        public Enemy(Texture2D enemyTex)
+        {
+            _tex = enemyTex;
+        }
 
         public void Attack(Point target, float precision)
         {
@@ -68,9 +75,15 @@ namespace Darkmaze
         {
             if (Active)
             {
-                sb.DrawLine(Position*2, (Position+_curMove)*2, Color.Red);
-                if(_impactRadius > 1)
-                    sb.DrawCircle(Target*2, _impactRadius, 16, Color.Red);
+                //sb.DrawLine(Position*2, (Position+_curMove)*2, Color.Red);
+
+                sb.DrawCircle(Target*2, _impactRadius, 16, Color.Black, 2f);
+                sb.DrawCircle(Target*2, _impactRadius - 6, 16, Color.Black, 2f);
+                sb.DrawCircle(Target*2, _impactRadius - 12, 16, Color.Black, 2f);
+
+                var pos = (Position + _curMove) * 2;
+                var angle = MathHelper.Pi - (float)Math.Atan2(_curDir.X, _curDir.Y);
+                sb.Draw(_tex, pos, origin: new Vector2(16, 16), rotation:angle);
             }
         }
     }

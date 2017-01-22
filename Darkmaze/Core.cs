@@ -20,6 +20,7 @@ namespace Darkmaze
         SoundEffect _clac;
         Song _success;
         Texture2D _door;
+        Texture2D _enemyTex;
 
         private int level = 1;
         private uint[] _pixels;
@@ -50,7 +51,8 @@ namespace Darkmaze
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             
-            NewLevel(false, false);
+            _enemyTex = Content.Load<Texture2D>("enemy");
+            NewLevel(withWalls:false);
 
             base.Initialize();
         }
@@ -121,7 +123,7 @@ namespace Darkmaze
                         position = new Point {X = rand.Next(2*Mfactor, Width), Y = rand.Next(2*Mfactor, Height)};
                     } while (_engine.IsWall(position.X, position.Y));
 
-                    _enemies.Add(new Enemy {Position = position.ToVector2()});
+                    _enemies.Add(new Enemy(_enemyTex) {Position = position.ToVector2()});
                 }
             }
 

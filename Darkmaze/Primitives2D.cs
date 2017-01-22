@@ -206,7 +206,8 @@ namespace C3.XNA
         /// <param name="thickness">The thickness of the lines used</param>
         public static void DrawCircle(this SpriteBatch spriteBatch, Vector2 center, float radius, int sides, Color color, float thickness = 1f)
         {
-            DrawPoints(spriteBatch, center, CreateCircle(radius, sides), color, thickness);
+            if(radius > 1f)
+                DrawPoints(spriteBatch, center, CreateCircle(radius, sides), color, thickness);
         }
 
         /// <summary>
