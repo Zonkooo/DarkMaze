@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Darkmaze
 {
@@ -14,8 +15,17 @@ namespace Darkmaze
         [STAThread]
         static void Main()
         {
-            using (var game = new Core())
-                game.Run();
+            try
+            {
+                using (var game = new Core())
+                    game.Run();
+            }
+            catch (Exception e)
+            {
+                using (var writer = new StreamWriter("crash.log"))
+                    writer.Write(e);
+                throw;
+            }
         }
     }
 #endif
