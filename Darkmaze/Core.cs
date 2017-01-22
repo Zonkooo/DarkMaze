@@ -145,13 +145,14 @@ namespace Darkmaze
             {
                 var pos = _engine.Oscillator1Position;
                 if (keys.IsKeyDown(Keys.Up) && !_engine.IsWall(pos.X, pos.Y - 1))
-                    _engine.Oscillator1Position = new Point(pos.X, pos.Y - 1);
+                    pos = new Point(pos.X, pos.Y - 1);
                 if (keys.IsKeyDown(Keys.Down) && !_engine.IsWall(pos.X, pos.Y + 1))
-                    _engine.Oscillator1Position = new Point(pos.X, pos.Y + 1);
+                    pos = new Point(pos.X, pos.Y + 1);
                 if (keys.IsKeyDown(Keys.Left) && !_engine.IsWall(pos.X - 1, pos.Y))
-                    _engine.Oscillator1Position = new Point(pos.X - 1, pos.Y);
+                    pos = new Point(pos.X - 1, pos.Y);
                 if (keys.IsKeyDown(Keys.Right) && !_engine.IsWall(pos.X + 1, pos.Y))
-                    _engine.Oscillator1Position = new Point(pos.X + 1, pos.Y);
+                    pos = new Point(pos.X + 1, pos.Y);
+                _engine.Oscillator1Position = pos;
 
                 if (keys.IsKeyDown(Keys.Space) && _prevState.IsKeyDown(Keys.Space) && !_engine.Oscillator1Active)
                 {
