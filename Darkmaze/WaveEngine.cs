@@ -204,7 +204,6 @@ namespace WaveSimulator
         void CalculateForces()
         {
             // This loop calculates the forces exerted on the particles.
-            //Parallel.For(0, vd.Length, new ParallelOptions {MaxDegreeOfParallelism = 4}, index =>
             for (int index = 0; index < vd.Length; index += 1)
             {
                 // If this is a static particle, it will not move at all. Continue with the next particle.
@@ -327,7 +326,6 @@ namespace WaveSimulator
 
 
                 // UPPER-LEFT
-
                 if (!(index % size == 0 || (index >= 0 && index < size)))
                 {
                     if (!vd_static[index - size - 1])
@@ -341,7 +339,7 @@ namespace WaveSimulator
 
                 if (num_of_part != 0)
                 {
-                    heights /= (float) num_of_part;
+                    heights /= num_of_part;
                     
                     vda[index] += -(vd[index] - heights) / mass;
                 }
@@ -356,33 +354,20 @@ namespace WaveSimulator
 
                 cont:
                 ;
-            }//);
+            }
+
             // Now we have finished with the force calculation.
-
-            // Origin height is zero. So "shifting" is the distance between the system average height and the origin.
-//            float shifting = -total_height / (float)vd.Length;
-
-
-
             // We are taking the final steps in this loop
             for (int index = 0; index < vd.Length; index += 1)
             {
-
                 // Acceleration feeds velocity. Don't forget that we took care of the damping before.
                 vdv[index] += vda[index];
-
 
                 // Here is the purpose of "action_resolution":
                 // It is used to divide movements.
                 // If the particle goes along the road at once, a chaos is most likely unavoidable.
                 vd[index] = vd[index] + vdv[index] / action_resolution;
 //                vd[index] = MathHelper.Clamp(vd[index] + vdv[index] / action_resolution, -1f, 1f);
-
-
-                // Here is the last step on shifting the whole system to the origin point.
-//                vd[index] += shifting;
-
-
             }
 
         }
@@ -447,7 +432,7 @@ namespace WaveSimulator
                 }
 
                 // This value is sustainability decreasion rate per row/column. The decreasion is linear.
-                float dec = (sustain - min_sustain) / (float)absorb_offset;
+                float dec = (sustain - min_sustain) / absorb_offset;
                 // This one stores the current sustainability.
                 float cur = min_sustain;
 
