@@ -394,6 +394,8 @@ namespace WaveSimulator
                 // Brightness. This value is the 'brightness' of the height.
                 // Now we see why "limit" makes sense.
                 byte bright = (byte)((vd[index] + 1f) / (2f / 255f));
+                if (bright == 126 || bright == 125)
+                    bright = 127;
 
                 if (vd_static[index])
                 {
