@@ -33,6 +33,7 @@ namespace Darkmaze
         private const int Width = Mfactor * 10 + 1;
         private const int Height = Mfactor * 10 + 1;
         private const int NbEnemies = 20;
+        private const float DetectionThreshold = 0.022f;
 
         public Core()
         {
@@ -185,7 +186,7 @@ namespace Darkmaze
             {
                 //update enemies
                 var wavePower = Math.Abs(_engine.GetAmplitude((int) enemy.Position.X, (int) enemy.Position.Y));
-                if (!enemy.Active && wavePower > 0.02f)
+                if (!enemy.Active && wavePower > DetectionThreshold)
                 {
                     //jump on player
                     enemy.Attack(_source, wavePower);

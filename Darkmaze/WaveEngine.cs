@@ -17,7 +17,7 @@ namespace WaveSimulator
 
         float mass = 0.1f; // Mass of each particle. It is the same for all particles.
         float action_resolution = 20f; // Resolution of movement of particles.
-        float sustain = 40f; // Anti-damping. Propagation range increases by increasing this variable. Minimum is 1f.
+        float sustain = 50f; // Anti-damping. Propagation range increases by increasing this variable. Minimum is 1f.
         public float phase1 = 0f; // Current phase value of oscillator1.
 
         bool osc1active = false; // Is oscillator1 is turned on?
@@ -398,6 +398,8 @@ namespace WaveSimulator
                 byte bright = (byte)((vd[index] + 1f) / (2f / 255f));
                 if (bright == 126 || bright == 125)
                     bright = 127;
+                if (bright == 124)
+                    bright = 125;
 
                 if (vd_static[index])
                 {
